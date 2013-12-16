@@ -74,6 +74,10 @@ for ($i=0;$i<count($track);$i++)
 	{
 		echo $num . " " . "Is still located at shipping location\n";
 	} 
+	elseif (strstr($data,"double-check it"))
+	{
+		echo $num . " " . "Is an invalid tracking number or has not been scanned yet\n";
+	}
 }
 
 
