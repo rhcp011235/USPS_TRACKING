@@ -1,4 +1,7 @@
-USPS_TRACKING
-=============
+Simple yet easy mass tracking system for the USPS (United States Postal Service)
+By: rhcp011235
 
-Mass tracking system written in php and runs via command line
+track.php - Main code file
+trackingnumbers.txt - File where you put your tracking numbers
+
+12/15/2013
