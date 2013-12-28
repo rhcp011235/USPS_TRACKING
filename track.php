@@ -8,21 +8,37 @@
 # Date: Dec 15, 2013
 
 // parts taken from php.net
-function get_data($num)
+function get_data($num,$carrier)
 {
 
 
 
+	if ($carrier == 'USPS')
+	{
+		#echo "DEBUG: we are tracking USPS\n";
+		$fields = array(
+			'tRef'=>'qt',
+			'tLc' => '1',
+			'tLabels'=> $num);
+	}
+	elseif ($carrier == 'CAN')
+	{
+		#echo "DEBUG: we are tracking CANADA\n";
+		 $fields = array(
+			'trackingNumber'=> $num,
+        	       	'x' => '46',
+        	      	'y'=> '9');
+	}
+	
+	if ($carrier == 'USPS')
+        	$first_url = "https://tools.usps.com/go/TrackConfirmAction!input.action";
+	if ($carrier == 'CAN')
+		$first_url = "http://www.canadapost.ca/cpotools/apps/track/personal/findByTrackNumber";
 
-	$fields = array(
-	'tRef'=>'qt',
-	'tLc' => '1',
-	'tLabels'=> $num);
-
+	
 	$fields_string = http_build_query($fields);
+	
 
-
-	$first_url = "https://tools.usps.com/go/TrackConfirmAction!input.action";
 
    
         $ch = curl_init();
@@ -50,16 +66,26 @@ function get_data($num)
 
 
 $file = "trackingnumbers.txt";
-
 $tracks = file_get_contents($file);
 
 $track = explode("\n", $tracks);
 
 for ($i=0;$i<count($track);$i++)  
 {
-    	$num = $track[$i];		
-	$data = get_data($num);
+    	$num = $track[$i];
+	if (strstr($num,"LM"))
+	{
+		$carrier = "CAN";
+	} else {
+		$carrier = "USPS";
+	}
+			
+	$data = get_data($num,$carrier);
 	sleep(3);
+	if($carrier == 'USPS') goto USPS; else goto CAN;
+
+
+	USPS:
 	if (strstr($data,"Delivered"))
 	{
 		echo $num . " " . "Has been Delivered\n";
@@ -78,7 +104,24 @@ for ($i=0;$i<count($track);$i++)
 	{
 		echo $num . " " . "Is an invalid tracking number or has not been scanned yet\n";
 	}
-}
+
+
+	CAN:
+	if (strstr($data,"Item has arrived in Canada and was sent for further processing."))
+        {
+                echo $num . " " . "Processing in Canada\n";
+        }
+	elseif (strstr($data,"International item has left originating country and is en route to Canada"))
+        {
+                echo $num . " " . "en route to Canada\n";
+        }
+	elseif (strstr($data,"International item mailed in originating country"))
+        {
+                echo $num . " " . "Is still located at shipping location\n";
+        }
+
+
+}	
 
 
 ?>
