@@ -107,7 +107,11 @@ for ($i=0;$i<count($track);$i++)
 
 
 	CAN:
-	if (strstr($data,"Item has arrived in Canada and was sent for further processing."))
+	if (strstr($data,"Item delivered"))
+	{
+		echo $num . " " . "Has been Delivered\n";
+        }
+	elseif (strstr($data,"Item has arrived in Canada and was sent for further processing."))
         {
                 echo $num . " " . "Processing in Canada\n";
         }
